@@ -20,6 +20,5 @@ from django.conf import settings
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^mycalender/', include('mycalender.urls')),
-#    url(r'^', include('music.urls')),
+    url(r'^mycalender/', include("mycalender.urls", namespace='mycalender')),
 ]

@@ -1,0 +1,20 @@
+After installing all initial required packages of Django, followed some initializing commands:
+
+These all commands should be performed in your project directory only.
+Admin account must be looged in in order to submit data to database.
+
+1. django-admin startproject calender
+2. django-admin startapp mycalender
+3. python manage.py runserver (for running server)
+4. python manage.py createsuperuser (for creating admin user)
+5. python manage.py makemigrations (for detecting changes in db table)
+6. python manage.py migrate (for applying changes in db)
+
+
+
+server link-- http://127.0.0.1:8000/
+for admin page --  http://127.0.0.1:8000/admin/
+for main index page-- http://127.0.0.1:8000/mycalender/
+
+
+

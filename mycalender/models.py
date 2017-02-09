@@ -1,10 +1,12 @@
 from __future__ import unicode_literals
-from django.db import models
 from django.contrib.auth.models import Permission, User
 from django.db import models
+from datetime import datetime
 
 
 class Event(models.Model):
+
+     event_date = models.CharField(max_length=11,default="yyyy-mm-dd")
      event_name = models.CharField(max_length=50)
      location = models.CharField(max_length=50)
      starts = models.CharField(max_length=10)

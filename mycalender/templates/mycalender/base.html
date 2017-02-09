@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<html>
+<head>
+{% load staticfiles %}
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<style>
+body {
+    font-family: Tahoma;
+}
+
+header {
+    text-align: center;
+}
+
+#calendar {
+    width: 100%;    
+}
+
+#calendar a {
+    color: #8e352e;
+    text-decoration: none;
+}
+
+#calendar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+#calendar li {
+    display: block;
+    float: left;
+    width:14.342%;
+    padding: 5px;
+    box-sizing:border-box;
+    border: 1px solid #ccc;
+    margin-right: -1px;
+    margin-bottom: -1px;
+}
+
+#calendar ul.weekdays {
+    height: 40px;
+    background: white;
+}
+
+#calendar ul.weekdays li {
+    text-align: center;
+    text-transform: uppercase;
+    line-height: 20px;
+    border: none !important;
+    padding: 10px 6px;
+    color: #b3b3b3;
+    font-size: 13px;
+}
+
+#calendar .days li {
+    height: 180px;
+}
+
+#calendar .days li:hover {
+    background: #d3d3d3;
+}
+
+#calendar .date {
+    text-align: center;
+    margin-bottom: 5px;
+    padding: 4px;
+    background: #333;
+    color: #fff;
+    width: 20px;
+    border-radius: 50%;
+    float: right;
+}
+
+#calendar .event {
+    clear: both;
+    display: block;
+    font-size: 13px;
+    border-radius: 4px;
+    padding: 5px;
+    margin-top: 40px;
+    margin-bottom: 5px;
+    line-height: 14px;
+    background: #e4f2f2;
+    border: 1px solid #b5dbdc;
+    color: #009aaf;
+    text-decoration: none;
+}
+
+#calendar .event-desc {
+    color: #666;
+    margin: 3px 0 7px 0;
+    text-decoration: none;  
+}
+
+#calendar .other-month {
+    background: #f5f5f5;
+    color: #666;
+}
+ /* Popup container */
+.popup {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+/* The actual popup (appears on top) */
+.popup .popuptext {
+    visibility: hidden;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 8px 0;
+    position: relative;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -80px;
+}
+
+/* Popup arrow */
+.popup .popuptext::after {
+    content: "";
+    position: relative;
+    right: 100%;
+    top: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+
+/* Toggle this class when clicking on the popup container (hide and show the popup) */
+.popup .show {
+    visibility: visible;
+    -webkit-animation: fadeIn 1s;
+    animation: fadeIn 1s
+}
+
+/* Add animation (fade in the popup) */
+@-webkit-keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
+@keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity:1 ;}
+}
+/*               
+                Mobile Responsiveness
+                 */
+
+
+@media(max-width: 768px) {
+
+    #calendar .weekdays, #calendar .other-month {
+        display: none;
+    }
+
+    #calendar li {
+        height: auto !important;
+        border: 1px solid #ededed;
+        width: 100%;
+        padding: 10px;
+        margin-bottom: -1px;
+    }
+
+    #calendar .date {
+        float: none;
+    }
+}
+</style>
+</head>
+<body>
+
+
+<div id="calendar-wrap">
+            <header>
+                <h1> July 2017</h1>
+            </header>
+            <div id="calendar">
+                <ul class="weekdays">
+                    <li>Sunday</li>
+                    <li>Monday</li>
+                    <li>Tuesday</li>
+                    <li>Wednesday</li>
+                    <li>Thursday</li>
+                    <li>Friday</li>
+                    <li>Saturday</li>
+                </ul>
+
+                <!-- Days from previous month -->
+               
+                <ul class="days">
+                    <li class="day other-month">
+                        <div class="date">27</div>
+                        
+                         <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+                        {% for e in event %}
+                        {% ifequal e.event_date "2017-06-27"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                 
+                    </li>
+                    <li class="day other-month">
+                        <div class="date">28</div>
+                        <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+                        
+                         {% for e in event %}
+
+                        {% ifequal e.event_date "2017-06-28"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{a.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}
+
+                                   
+                    </li>
+                    <li class="day other-month">
+
+                        <div class="date">29</div>
+                        
+                        <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+
+                         {% for e in event %}
+                        {% ifequal e.event_date "2017-06-29"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                       
+                    </li>
+                    <li class="day other-month">
+                        <div class="date">30</div>
+                       
+                        <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+
+                         {% for e in event %}
+                        {% ifequal e.event_date "2017-06-30"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                       
+                    </li>
+                    <li class="day other-month">
+                        <div class="date">31</div>
+                       
+                        <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+
+                         {% for e in event %}
+                        {% ifequal e.event_date "2017-06-31"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                      
+                    </li>
+
+                    <!-- Days in current month -->
+
+                    <li class="day">
+                        <div class="date">1</div>
+                        
+                        <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+
+                         {% for e in event %}
+                        {% ifequal e.event_date "2017-07-01"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                        
+                    </li>
+                    <li class="day">
+                        <div class="date">2</div>
+                        
+                        <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+
+                       {% for e in event %}
+                        {% ifequal e.event_date "2017-07-02"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}
+                </ul>
+
+                    <!-- Row #2 -->
+
+                <ul class="days">
+                    <li class="day">
+                        <div class="date">3</div>
+                        
+                        <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+
+                         {% for e in event %}
+                        {% ifequal e.event_date "2017-07-03"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                        
+                    </li>
+                    <li class="day">
+                        <div class="date">4</div>
+                        
+                        <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+
+                         {% for e in event %}
+                        {% ifequal e.event_date "2017-07-04"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                         
+                    </li>
+                    <li class="day">
+                        <div class="date">5</div>
+                        
+                        <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+
+                         {% for e in event %}
+                        {% ifequal e.event_date "2017-07-05"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                       
+                    </li>
+                    <li class="day">
+                        <div class="date">6</div>
+                        
+                        <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+ 
+                        { {% for e in event %}
+                        {% ifequal e.event_date "2017-07-06"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                      
+                    </li>
+                    <li class="day">
+                        <div class="date">7</div>
+                        
+                          
+                        <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+                        {% for e in event %}
+                        {% ifequal e.event_date "2017-07-07"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                    
+                    </li>
+                    <li class="day">
+                        <div class="date">8</div>
+                       
+                        
+                         <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+                         {% for e in event %}
+                        {% ifequal e.event_date "2017-07-08"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                       
+                    </li>
+                    <li class="day">
+                        <div class="date">9</div>
+                         
+                        
+                         <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+                         {% for e in event %}
+                        {% ifequal e.event_date "2017-07-09"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                      
+                    </li>
+                </ul>
+
+                    <!-- Row #3 -->
+
+                <ul class="days">
+                    <li class="day">
+                        <div class="date">10</div>
+                        
+                        
+                          <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+                         {% for e in event %}
+                        {% ifequal e.event_date "2017-07-10"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                    
+                    </li>
+                    <li class="day">
+                        <div class="date">11</div>
+                        
+                        
+                        <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+                         {% for e in event %}
+                        {% ifequal e.event_date "2017-07-11"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                    
+                    </li>
+                    <li class="day">
+                        <div class="date">12</div>
+                        
+                        <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+
+                         {% for e in event %}
+                        {% ifequal e.event_date "2017-07-12"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                     
+                    </li>
+                    <li class="day">
+                        <div class="date">13</div>
+                        
+                        
+                         <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+                         {% for e in event %}
+                        {% ifequal e.event_date "2017-07-13"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                    
+                    </li>
+                    <li class="day">
+                        <div class="date">14</div>
+                        
+                         <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+
+                         {% for e in event %}
+                        {% ifequal e.event_date "2017-07-14"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                   
+                    </li>
+                    <li class="day">
+                        <div class="date">15</div>
+                        
+                        <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+
+                         {% for e in event %}
+                        {% ifequal e.event_date "2017-07-15"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                      
+                    </li>
+                    <li class="day">
+                        <div class="date">16</div>
+                        
+                        
+                         <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+                         {% for e in event %}
+                        {% ifequal e.event_date "2017-07-16"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                  
+                    </li>
+                </ul>
+
+                    <!-- Row #4 -->
+
+                <ul class="days">
+                    <li class="day">
+                        <div class="date">17</div>
+                        
+                        <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+
+                         {% for e in event %}
+                        {% ifequal e.event_date "2017-07-17"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                      
+                    </li>
+                    <li class="day">
+                        <div class="date">18</div>
+                        
+                        <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+
+                         {% for e in event %}
+                        {% ifequal e.event_date "2017-07-18"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                      
+                    </li>
+                    <li class="day">
+                        <div class="date">19</div>
+                       
+                        <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+
+                         {% for e in event %}
+                        {% ifequal e.event_date "2017-07-19"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                       
+                    </li>
+                    <li class="day">
+                        <div class="date">20</div>
+                       
+                        <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+
+                         {% for e in event %}
+                        {% ifequal e.event_date "2017-07-20"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                       
+                    </li>
+                    <li class="day">
+                        <div class="date">21</div>
+                        
+                        <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+
+                         {% for e in event %}
+                        {% ifequal e.event_date "2017-07-21"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                      
+                    </li>
+                    <li class="day">
+                        <div class="date">22</div>
+                       
+                        <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+
+                         {% for e in event %}
+                        {% ifequal e.event_date "2017-07-22"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                       
+                    </li>
+                    <li class="day">
+                        <div class="date">23</div> 
+                     
+                        
+                         <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+                         {% for e in event %}
+                        {% ifequal e.event_date "2017-07-23"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                      
+                    </li>
+                </ul>
+
+                        <!-- Row #5 -->
+
+                <ul class="days">
+                    <li class="day">
+                        <div class="date">24</div>
+                       
+                        <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+
+                         {% for e in event %}
+                        {% ifequal e.event_date "2017-07-24"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                       
+                    </li>
+                    <li class="day">
+                        <div class="date">25</div>
+                     
+                        <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+
+                        {% for e in event %}
+                        {% ifequal e.event_date "2017-07-25"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                     
+                    </li>
+                    <li class="day">
+                        <div class="date">26</div>
+                       
+                        
+
+                         {% for e in event %}
+                        {% ifequal e.event_date "2017-07-26"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                    
+                    </li>
+                    <li class="day">
+                        <div class="date">27</div>
+                       
+                        
+                          <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+                        {% for e in event %}
+                        {% ifequal e.event_date "2017-07-27"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}
+                      
+                    </li>
+                    <li class="day">
+                        <div class="date">28</div>
+                     
+                        <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+
+                        {% for e in event %}
+                        {% ifequal e.event_date "2017-07-28"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                      
+                    </li>
+                    <li class="day">
+                        <div class="date">29</div>
+                   
+                        <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+
+                         {% for e in event %}
+                        {% ifequal e.event_date "2017-07-29"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                    
+                    </li>
+                    <li class="day">
+                        <div class="date">30</div>
+                  
+                        <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+
+                        {% for e in event %}
+                        {% ifequal e.event_date "2017-07-30"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                       
+                    </li>
+                </ul>
+
+                <!-- Row #6 -->
+
+                <ul class="days">
+                    <li class="day">
+                        <div class="date">31</div>
+                    
+                        <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+
+                       {% for e in event %}
+                        {% ifequal e.event_date "2017-07-31"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                        
+                    </li>
+                    <li class="day other-month">
+                        <div class="date">1</div>
+                     
+                        <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+
+                        {% for e in event %}
+                        {% ifequal e.event_date "2017-08-01"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}  <!-- Next Month -->                       
+                    </li>
+                    <li class="day other-month">
+                        <div class="date">2</div>
+                      
+                        
+                        <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+                        {% for e in event %}
+                        {% ifequal e.event_date "2017-08-02"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                         
+                    </li>
+                    <li class="day other-month">
+                        <div class="date">3</div>
+                     
+                        
+                        <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+                        {% for e in event %}
+                        {% ifequal e.event_date "2017-08-03"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                     
+                    </li>
+                    <li class="day other-month">
+                        <div class="date">4</div> 
+                     
+                        <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+ 
+                        {% for e in event %}
+                        {% ifequal e.event_date "2017-08-04"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                    
+                    </li>
+                    <li class="day other-month">
+                        <div class="date">5</div>
+                  
+                        <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+ 
+                        {% for e in event %}
+                        {% ifequal e.event_date "2017-08-05"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                     
+                    </li>
+                    <li class="day other-month">
+                        <div class="date">6</div>
+                       
+                        
+                        <div class="popup" onclick="myFunction()">Add-Event
+                          <div class="popuptext" id="myPopup" onclick="clickFunction()"><form method="POST" name="myForm" id="myForm" action="/mycalender/create/">{% csrf_token %}{{form}} <input type='submit' form="myForm" class='btn btn-default' value='Create Event' /></form></div>
+                        </div>
+                       {% for e in event %}
+                        {% ifequal e.event_date "2017-08-06"  %}
+                         <div class="popup" onclick="myFunction()">Your-Event
+<div class="popuptext" id="myPopup" onclick="clickFunction()"><div class="event">
+<div class="event-desc"><ul><li>{{e.event_name}}</li><li>{{e.location}}</li><li>{{e.description}}</li></ul></div><div class="event-time"><ul><li>{{e.starts}}</li>
+<li>{{e.ends}}</li></ul></div></div></div></div>
+                        {% endifequal %}
+                        {% endfor %}                     
+                    </li>
+                </ul>
+
+            </div><!-- /. calendar -->
+        </div>
+   <script>
+// When the user clicks on <div>, open the popup
+function myFunction() {
+    var popup = document.getElementById("myPopup");
+    popup.classList.toggle("show");
+}
+function clickFunction() {
+    var popup = document.getElementById("myPopup");
+    popup.classList.toggle("show");
+}
+</script>
+        <!-- /. wrap -->
+</body>
+</html>
