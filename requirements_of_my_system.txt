@@ -8,7 +8,7 @@ debtagshw==0.1
 defer==1.0.6
 dirspec==13.10
 distro-info==0.12
-Django==1.10.4
+Django==2.2.24
 django-allauth==0.30.0
 django-filter==1.0.1
 django-social-auth==0.7.28
